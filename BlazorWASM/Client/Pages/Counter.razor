@@ -6,21 +6,60 @@
 
 <p role="status">Current count: <span class="@BackgroundColor">@currentCount</span></p>
 
+@*2-way bind: Default behavior of html element. When focus changes the componenet value is updated.*@
+<p>Default(change focus) 2-way bind <input type="number" @bind="@increment" /></p>
+
+@*2-way bind: Change event that selects a different @bind:event to update HTML and componenet elements*@
+<p>On input 2-way bind<input type="number" @bind="@increment" @bind:event="oninput" /></p>
+
+@*2-way bind: Prevent default action. Alters input action to update value with key presses rather than reading field
+    but also prevents the +/- key press from being added to the input field.*@
+<p>Key press +/- 2-way bind<input type="number" @bind="@increment" @onkeypress="KeyHandler" @onkeypress:preventDefault="@shouldPreventDefault" /></p>
+
+@*Propagation: Prevent progration of an event from moving up to parent.*@
+<div style="width: 400px; height: 400px; background: yellow" @onmousemove="OuterMouseMove">
+    @outerPos
+    <div style="width: 300px; height: 300px; background: green; margin:50px" @onmousemove="InnerMouseMove" @onmousemove:stopPropagation>
+        @innerPos
+    </div>
+</div>
+<br />
 <button disabled="@(currentCount > 10)" class="btn btn-primary" @onclick="IncrementCount">Click me</button>
 
 @code {
     private int currentCount = 0;
     private string BackgroundColor => (currentCount % 2 == 0) ? "red-background" : "yellow-background";
+    private int increment;
+    private bool shouldPreventDefault = true;
+    private string innerPos = "Nothing Yet";
+    private void InnerMouseMove(MouseEventArgs e)
+    {
+        innerPos = $"INNER Mouse at {e.ClientX}x{e.ClientY}";
+    }
+    private string outerPos = "Nothing Yet";
+    private void OuterMouseMove(MouseEventArgs e) => outerPos = $"OUTER Mouse at {e.ClientX}x{e.ClientY}";
+
+    private void KeyHandler(KeyboardEventArgs e)
+    {
+        if (e.Key == "+")
+        {
+            increment++;
+        }
+        else if (e.Key == "-")
+        {
+            increment--;
+        }
+    }
 
     private void IncrementCount(MouseEventArgs e)
     {
         if (e.CtrlKey)
         {
-            currentCount--;
+            currentCount -= increment;
         }
         else
         {
-           currentCount++; 
+            currentCount += increment;
         }
     }
 }
