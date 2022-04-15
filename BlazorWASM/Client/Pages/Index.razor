@@ -1,9 +1,41 @@
 ﻿@page "/"
-
-<PageTitle>Index</PageTitle>
+@using BlazorWASM.Client.Pages
+<LifeCycle Counter="@_counter" />
+<button class="btn btn-primary" @onclick="Increment">Increment!</button>
 
 <h1>Hello</h1>
 
-Welcome to your new app.
+<Dismissable @bind-Show="ShowAlert" @ref="alert">
+    <span class="oi oi-check mr-2" aria-hidden="true"></span>
+    <strong>Blazor is niffty</strong>
+</Dismissable>
 
-<SurveyPrompt Title="How is Blazor working for you?" />
+<button @onclick="ToggleAlert" class="btn btn-success">Toggle</button>
+<Timer TimeInSeconds="5" Tick="ToggleAlert" />
+
+<GrandMother>
+    <GrandChild />
+    <Dismissable Show="true">
+        <GrandChild />
+    </Dismissable>
+</GrandMother>
+
+
+@code {
+    private int _counter = 1;
+
+    private void Increment()
+    {
+        _counter += 1;
+    }
+
+    public bool ShowAlert { get; set; } = true;
+
+    public void ToggleAlert()
+    {
+        ShowAlert = !ShowAlert;
+    }
+
+    public Dismissable alert { get; set; } = default!;
+
+}
